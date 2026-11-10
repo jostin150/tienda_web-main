@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block titulo %}Nuevo producto{% endblock %}
+
+{% block contenido %}
+<main class="pagina">
+  <p class="volver"><a href="{{ url_for('productos') }}">← Productos</a></p>
+
+  <div class="encabezado-pagina">
+    <div>
+      <p class="antetitulo">CATÁLOGO</p>
+      <h1 class="titulo-pagina">Nuevo producto</h1>
+    </div>
+  </div>
+
+  <section class="caja caja-form" aria-label="Datos del producto">
+    <form method="post">
+      <div class="campo">
+        <label for="nombre">Nombre</label>
+        <input id="nombre" name="nombre" placeholder="Gorra azul" required value="{{ request.form.nombre }}">
+      </div>
+
+      <div class="campos-2">
+        <div class="campo">
+          <label for="precio">Precio</label>
+          <input id="precio" type="number" name="precio" step="0.01" min="0" placeholder="80000" required value="{{ request.form.precio }}">
+        </div>
+        <div class="campo">
+          <label for="stock">Stock</label>
+          <input id="stock" type="number" name="stock" min="0" placeholder="10" required value="{{ request.form.stock }}">
+        </div>
+      </div>
+
+      <div class="campos-2">
+        <div class="campo">
+          <label for="talla">Talla</label>
+          <input id="talla" name="talla" placeholder="M, Única, 7.5" value="{{ request.form.talla }}">
+        </div>
+        <div class="campo">
+          <label for="color">Color</label>
+          <input id="color" name="color" placeholder="Azul" value="{{ request.form.color }}">
+        </div>
+      </div>
+
+      <div class="campo">
+        <label for="imagen">Imagen (URL)</label>
+        <input id="imagen" name="imagen" placeholder="https://..." value="{{ request.form.imagen }}">
+      </div>
+
+      <button type="submit" class="boton-negro">Guardar producto</button>
+    </form>
+  </section>
+</main>
+{% endblock %}

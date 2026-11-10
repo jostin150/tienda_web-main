@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block titulo %}Administración{% endblock %}
+
+{% block contenido %}
+<main class="pagina">
+  <div class="encabezado-pagina">
+    <div>
+      <p class="antetitulo">PANEL DEL ADMINISTRADOR</p>
+      <h1 class="titulo-pagina">Admin</h1>
+    </div>
+    <a class="boton-negro chico como-enlace" style="width:auto" href="{{ url_for('nuevo_producto') }}">+ Nuevo producto</a>
+  </div>
+
+  <h2 class="subtitulo">Inventario</h2>
+  {% if productos %}
+  <div class="tabla-scroll">
+    <table class="tabla">
+      <thead>
+        <tr><th>Producto</th><th>Detalle</th><th>Stock</th><th>Agregar stock</th><th class="num"><span class="solo-lector">Editar</span></th></tr>
+      </thead>
+      <tbody>
+        {% for p in productos %}
+        <tr>
+          <td class="nombre"><a href="{{ url_for('detalle_producto', product_id=p.id) }}">{{ p.name }}</a></td>
+          <td>{{ p.color }}{% if p.size %} · {{ p.size }}{% endif %}</td>
+          <td><span class="estado {{ 'cancelado' if p.stock <= 0 else '' }}">{{ p.stock }}</span></td>
+          <td>
+            <form method="post" action="{{ url_for('agregar_stock', product_id=p.id) }}" class="form-stock">
+              <input type="number" name="cantidad" min="1" value="1" required aria-label="Cantidad a agregar a {{ p.name }}">
+              <button type="submit" class="boton-contorno chico">Agregar</button>
+            </form>
+          </td>
+          <td class="num"><a href="{{ url_for('editar_producto', product_id=p.id) }}">Editar</a></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <p class="vacio">Aún no hay productos. <a href="{{ url_for('nuevo_producto') }}">Agrega el primero</a>.</p>
+  {% endif %}
+
+  <h2 class="subtitulo">Pedidos</h2>
+  {% if ordenes %}
+  <div class="tabla-scroll">
+    <table class="tabla">
+      <thead>
+        <tr><th>Cliente</th><th>Estado</th><th>Cambiar estado</th><th class="num">Total</th><th class="num"><span class="solo-lector">Detalle</span></th></tr>
+      </thead>
+      <tbody>
+        {% for o in ordenes %}
+        {% set c = clientes.get(o.user_id) %}
+        <tr>
+          <td class="nombre">{{ c.name if c else 'Usuario eliminado' }}</td>
+          <td><span class="estado {{ o.order_status.value|lower }}">{{ o.order_status.value }}</span></td>
+          <td>
+            {% set opciones = acciones[o.order_status] %}
+            {% if opciones %}
+            <form method="post" action="{{ url_for('admin_cambiar_estado', order_id=o.id) }}" class="form-stock">
+              <select name="accion" aria-label="Nuevo estado del pedido de {{ c.name if c else 'cliente' }}">
+                {% for valor, texto in opciones %}<option value="{{ valor }}">{{ texto }}</option>{% endfor %}
+              </select>
+              <button type="submit" class="boton-contorno chico">Aplicar</button>
+            </form>
+            {% else %}<span class="suave">Sin cambios posibles</span>{% endif %}
+          </td>
+          <td class="num">{{ o.total|money|replace(',', '.') }}</td>
+          <td class="num"><a href="{{ url_for('detalle_orden', order_id=o.id) }}">Ver</a></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <p class="vacio">Todavía no hay pedidos.</p>
+  {% endif %}
+</main>
+{% endblock %}

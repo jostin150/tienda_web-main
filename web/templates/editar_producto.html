@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block titulo %}Editar producto{% endblock %}
+
+{% block contenido %}
+<main class="pagina">
+  <p class="volver"><a href="{{ url_for('admin') }}">← Admin</a></p>
+
+  <div class="encabezado-pagina">
+    <div>
+      <p class="antetitulo">EDITANDO</p>
+      <h1 class="titulo-pagina">Editar producto</h1>
+    </div>
+  </div>
+
+  <section class="caja caja-form" aria-label="Datos del producto">
+    <form method="post">
+      <div class="campo">
+        <label for="nombre">Nombre</label>
+        <input id="nombre" name="nombre" required value="{{ request.form.nombre if request.method == 'POST' else p.name }}">
+      </div>
+
+      <div class="campos-2">
+        <div class="campo">
+          <label for="precio">Precio</label>
+          <input id="precio" type="number" name="precio" step="0.01" min="0" required value="{{ request.form.precio if request.method == 'POST' else p.price|int }}">
+        </div>
+        <div class="campo">
+          <label for="stock">Stock</label>
+          <input id="stock" type="number" name="stock" min="0" required value="{{ request.form.stock if request.method == 'POST' else p.stock }}">
+        </div>
+      </div>
+
+      <div class="campos-2">
+        <div class="campo">
+          <label for="talla">Talla</label>
+          <input id="talla" name="talla" value="{{ request.form.talla if request.method == 'POST' else (p.size or '') }}">
+        </div>
+        <div class="campo">
+          <label for="color">Color</label>
+          <input id="color" name="color" value="{{ request.form.color if request.method == 'POST' else (p.color or '') }}">
+        </div>
+      </div>
+
+      <div class="campo">
+        <label for="imagen">Imagen (URL)</label>
+        <input id="imagen" name="imagen" placeholder="https://..." value="{{ request.form.imagen if request.method == 'POST' else (p.image or '') }}">
+      </div>
+
+      <button type="submit" class="boton-negro">Guardar cambios</button>
+    </form>
+  </section>
+</main>
+{% endblock %}

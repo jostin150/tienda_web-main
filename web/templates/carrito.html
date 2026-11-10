@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block titulo %}Mi carrito{% endblock %}
+
+{% block contenido %}
+<main class="pagina">
+  <div class="encabezado-pagina">
+    <div>
+      <p class="antetitulo">{{ carrito.items|length }} {{ 'PRODUCTO' if carrito.items|length == 1 else 'PRODUCTOS' }}</p>
+      <h1 class="titulo-pagina">Carrito</h1>
+    </div>
+  </div>
+
+  {% if not carrito.items %}
+  <p class="vacio">Tu carrito está vacío. <a href="{{ url_for('productos') }}">Ver productos</a></p>
+  {% else %}
+  <div class="dos-columnas">
+    <div>
+      <div class="tabla-scroll">
+        <table class="tabla">
+          <thead>
+            <tr><th>Producto</th><th>Cantidad</th><th class="num">Subtotal</th><th class="num"><span class="solo-lector">Acciones</span></th></tr>
+          </thead>
+          <tbody>
+            {% for item in carrito.items %}
+            <tr>
+              <td class="nombre">{{ item.product.name }}</td>
+              <td>{{ item.quantity }}</td>
+              <td class="num">{{ item.subtotal()|money|replace(',', '.') }}</td>
+              <td class="num">
+                <form method="post" action="{{ url_for('quitar_carrito', product_id=item.product_id) }}">
+                  <button type="submit" class="enlace quitar">Quitar</button>
+                </form>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <form method="post" action="{{ url_for('vaciar_carrito') }}" class="bajo-tabla">
+        <button type="submit" class="boton-peligro chico">Vaciar carrito</button>
+      </form>
+    </div>
+
+    <aside class="caja caja-fija" aria-labelledby="titulo-resumen">
+      <h2 id="titulo-resumen">Resumen</h2>
+
+      <dl class="totales">
+        <dt>Subtotal</dt><dd>{{ carrito.subtotal()|money|replace(',', '.') }}</dd>
+        <dt>IVA</dt><dd>{{ carrito.taxes()|money|replace(',', '.') }}</dd>
+        <dt class="total">Total</dt><dd class="total">{{ carrito.total()|money|replace(',', '.') }}</dd>
+      </dl>
+
+      {% if not usuario.addresses %}
+      <p class="aviso">Necesitas una dirección de envío para crear la orden.</p>
+      <a class="boton-negro como-enlace" href="{{ url_for('direcciones') }}">Agregar dirección</a>
+      {% else %}
+      <form method="post" action="{{ url_for('hacer_orden') }}">
+        <div class="campo">
+          <label for="address_id">Dirección</label>
+          <select id="address_id" name="address_id" required>
+            {% for a in usuario.addresses %}
+            <option value="{{ a.id }}">{{ a.address }}, {{ a.city }} ({{ a.tag or 'sin etiqueta' }})</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="campo">
+          <label for="payment_method">Método de pago</label>
+          <select id="payment_method" name="payment_method" required>
+            {% for m in metodos %}<option value="{{ m }}">{{ 'PSE' if m == 'pse' else m|capitalize }}</option>{% endfor %}
+          </select>
+        </div>
+
+        <button type="submit" class="boton-negro">Crear orden</button>
+      </form>
+      {% endif %}
+    </aside>
+  </div>
+  {% endif %}
+</main>
+{% endblock %}

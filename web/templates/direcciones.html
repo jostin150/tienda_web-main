@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block titulo %}Direcciones{% endblock %}
+
+{% block contenido %}
+<main class="pagina">
+  <div class="encabezado-pagina">
+    <div>
+      <p class="antetitulo">{{ usuario.addresses|length }} {{ 'DIRECCIÓN' if usuario.addresses|length == 1 else 'DIRECCIONES' }}</p>
+      <h1 class="titulo-pagina">Direcciones</h1>
+    </div>
+  </div>
+
+  <div class="dos-columnas">
+    <div>
+      {% if usuario.addresses %}
+      <ul class="lista-direcciones">
+        {% for a in usuario.addresses %}
+        <li class="direccion">
+          <div>
+            <p class="direccion-linea">
+              {{ a.address }}{% if a.apartment_number %}, apto {{ a.apartment_number }}{% endif %}, {{ a.city }}
+              <span class="etiqueta-chica">{{ a.tag or 'sin etiqueta' }}</span>
+            </p>
+            <p class="suave">Recibe: {{ a.receiver_name }} · {{ a.phone_number }}{% if a.reference_place %} · {{ a.reference_place }}{% endif %}</p>
+          </div>
+          <form method="post" action="{{ url_for('eliminar_direccion', address_id=a.id) }}">
+            <button type="submit" class="boton-peligro chico">Eliminar</button>
+          </form>
+        </li>
+        {% endfor %}
+      </ul>
+      {% else %}
+      <p class="vacio">Aún no tienes direcciones. Agrega una para poder crear órdenes.</p>
+      {% endif %}
+    </div>
+
+    <section class="caja" aria-labelledby="titulo-agregar">
+      <h2 id="titulo-agregar">Agregar dirección</h2>
+
+      <form method="post">
+        <div class="campos-2">
+          <div class="campo">
+            <label for="address">Dirección</label>
+            <input id="address" name="address" placeholder="Calle 10 # 20-30" required>
+          </div>
+          <div class="campo">
+            <label for="city">Ciudad</label>
+            <input id="city" name="city" placeholder="Medellín" required>
+          </div>
+        </div>
+
+        <div class="campos-2">
+          <div class="campo">
+            <label for="apartment_number">Apartamento (opcional)</label>
+            <input id="apartment_number" name="apartment_number">
+          </div>
+          <div class="campo">
+            <label for="tag">Etiqueta (opcional)</label>
+            <input id="tag" name="tag" placeholder="Casa, Oficina">
+          </div>
+        </div>
+
+        <div class="campo">
+          <label for="reference_place">Punto de referencia (opcional)</label>
+          <input id="reference_place" name="reference_place">
+        </div>
+
+        <div class="campos-2">
+          <div class="campo">
+            <label for="receiver_name">Quien recibe</label>
+            <input id="receiver_name" name="receiver_name" placeholder="{{ usuario.name }}">
+          </div>
+          <div class="campo">
+            <label for="phone_number">Teléfono</label>
+            <input id="phone_number" name="phone_number" placeholder="{{ usuario.phone }}">
+          </div>
+        </div>
+
+        <button type="submit" class="boton-negro">Agregar</button>
+      </form>
+    </section>
+  </div>
+</main>
+{% endblock %}

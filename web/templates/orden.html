@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block titulo %}Detalle de orden{% endblock %}
+
+{% block contenido %}
+<main class="pagina">
+  <p class="volver"><a href="{{ url_for('ordenes') }}">← Mis órdenes</a></p>
+
+  <div class="encabezado-pagina">
+    <div>
+      <p class="antetitulo"><span class="estado {{ o.order_status.value|lower }}">{{ o.order_status.value }}</span></p>
+      <h1 class="titulo-pagina">Detalle de orden</h1>
+    </div>
+  </div>
+
+  <div class="dos-columnas">
+    <div class="tabla-scroll">
+      <table class="tabla">
+        <thead>
+          <tr><th>Producto</th><th>Cantidad</th><th class="num">Subtotal</th></tr>
+        </thead>
+        <tbody>
+          {% for item in o.products %}
+          <tr>
+            <td class="nombre">{{ item.name }}</td>
+            <td>{{ item.quantity }}</td>
+            <td class="num">{{ item.subtotal()|money|replace(',', '.') }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <aside class="caja caja-fija" aria-labelledby="titulo-resumen">
+      <h2 id="titulo-resumen">Resumen</h2>
+
+      <dl class="totales">
+        <dt>Subtotal</dt><dd>{{ o.subtotal()|money|replace(',', '.') }}</dd>
+        <dt>IVA</dt><dd>{{ o.taxes()|money|replace(',', '.') }}</dd>
+        <dt>Envío</dt><dd>{{ o.shipping_cost|money|replace(',', '.') }}</dd>
+        <dt class="total">Total</dt><dd class="total">{{ o.total|money|replace(',', '.') }}</dd>
+        <dt>Pago</dt><dd>{{ o.payment_method|capitalize }}</dd>
+        {% if es_admin and cliente %}<dt>Cliente</dt><dd>{{ cliente.name }}</dd><dt>Contacto</dt><dd>{{ cliente.email }} · {{ cliente.phone }}</dd>{% endif %}
+        {% if direccion %}<dt>Envío a</dt><dd>{{ direccion.address }}, {{ direccion.city }}</dd>{% endif %}
+      </dl>
+
+      {% if es_admin %}
+      <h2>Acciones</h2>
+      <form method="post" class="acciones">
+        <button type="submit" class="boton-negro" name="accion" value="pagar">Confirmar pago</button>
+        <button type="submit" class="boton-contorno" name="accion" value="enviar">Confirmar envío</button>
+        <button type="submit" class="boton-contorno" name="accion" value="entregar">Marcar entregado</button>
+        <button type="submit" class="boton-peligro" name="accion" value="cancelar">Cancelar orden</button>
+      </form>
+      {% else %}
+      <p class="suave">La tienda actualizará el estado de tu pedido (pago, envío y entrega).</p>
+      {% endif %}
+    </aside>
+  </div>
+</main>
+{% endblock %}

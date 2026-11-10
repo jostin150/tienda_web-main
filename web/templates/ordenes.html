@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block titulo %}Mis órdenes{% endblock %}
+
+{% block contenido %}
+<main class="pagina">
+  <div class="encabezado-pagina">
+    <div>
+      <p class="antetitulo">{{ ordenes|length }} {{ 'ORDEN' if ordenes|length == 1 else 'ÓRDENES' }}</p>
+      <h1 class="titulo-pagina">Mis órdenes</h1>
+    </div>
+  </div>
+
+  {% if ordenes %}
+  <div class="tabla-scroll">
+    <table class="tabla">
+      <thead>
+        <tr><th>#</th><th>Estado</th><th>Productos</th><th class="num">Total</th><th class="num"><span class="solo-lector">Acciones</span></th></tr>
+      </thead>
+      <tbody>
+        {% for o in ordenes %}
+        <tr>
+          <td>{{ loop.index }}</td>
+          <td><span class="estado {{ o.order_status.value|lower }}">{{ o.order_status.value }}</span></td>
+          <td>{{ o.products|length }}</td>
+          <td class="num">{{ o.total|money|replace(',', '.') }}</td>
+          <td class="num"><a href="{{ url_for('detalle_orden', order_id=o.id) }}">{{ 'Gestionar' if es_admin else 'Ver' }}</a></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <p class="vacio">Aún no tienes órdenes. <a href="{{ url_for('productos') }}">Ver productos</a></p>
+  {% endif %}
+</main>
+{% endblock %}

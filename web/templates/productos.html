@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block titulo %}Catálogo{% endblock %}
+
+{% block contenido %}
+<main class="pagina">
+  <div class="encabezado-pagina">
+    <div>
+      <p class="antetitulo">{{ productos|length }} PRODUCTOS</p>
+      <h1 class="titulo-pagina">Catálogo</h1>
+    </div>
+    {% if es_admin %}<a class="boton-contorno chico como-enlace" href="{{ url_for('nuevo_producto') }}">+ Nuevo producto</a>{% endif %}
+
+  </div>
+
+  {% if productos %}
+  <div class="rejilla">
+    {% for p in productos %}
+    <article class="producto">
+      <a class="foto" href="{{ url_for('detalle_producto', product_id=p.id) }}">
+        {% if p.stock <= 0 %}<span class="agotado">AGOTADO</span>{% endif %}
+        {% if p.image %}
+          <img src="{{ p.image }}" alt="{{ p.name }}" onerror="this.style.visibility='hidden'">
+        {% else %}
+          <span class="sin-foto">FOTO</span>
+        {% endif %}
+      </a>
+
+      <h2>{{ p.name }}</h2>
+      <p class="precio">{{ p.price|money|replace(',', '.') }}</p>
+      <p class="detalle">{{ p.color }}{% if p.size %} · Talla {{ p.size }}{% endif %}</p>
+
+      <form method="post" action="{{ url_for('agregar_carrito', product_id=p.id) }}">
+        <button type="submit" class="boton-contorno"{% if p.stock <= 0 %} disabled{% endif %}>
+          {{ 'Agregar al carrito' if p.stock > 0 else 'Agotado' }}
+        </button>
+      </form>
+    </article>
+    {% endfor %}
+  </div>
+  {% else %}
+  <p class="vacio">Todavía no hay productos.{% if es_admin %} <a href="{{ url_for('nuevo_producto') }}">Agrega el primero</a>.{% endif %}</p>
+  {% endif %}
+</main>
+{% endblock %}
